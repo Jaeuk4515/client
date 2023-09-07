@@ -1,4 +1,4 @@
-import axios, { AxiosHeaders } from "axios";
+import axios, { AxiosHeaders, AxiosRequestConfig } from "axios";
 
 const allowMethod: string[] = ["get", "post", "put", "patch", "delete"];
 // TODO: 발표 전 수정
@@ -39,11 +39,12 @@ axios.defaults.timeout = 5000;
 // 정의된 함수 시그니처에 맞게 인터페이스 생성
 interface AxiosRequest {
     requestAxios: <T>(
-        method: string,
+        method: AxiosRequestConfig["method"],
         url: string,
-        data?: {},
-        headers?: {}
-    ) => Promise<T>;
+        data?: Pick<AxiosRequestConfig, "data" | "params">,
+        headers?: AxiosRequestConfig["headers"],
+        handleError?: (error: Error | unknown) => void
+    ) => Promise<T | void>;
 }
 
 const axiosRequest: AxiosRequest = {
@@ -57,17 +58,18 @@ const axiosRequest: AxiosRequest = {
      * @param url 호출 url 작성. path param은 url에 같이 정의해준다.
      * @param data request body에 해당하는 사항. post, put 시 추가/수정할 객체를 지정해주면 된다. get은 빈 객체를 보낸다.
      */
-    requestAxios: async <T>(
-        method: string,
+    requestAxios: async <T, Error>(
+        method = "",
         url: string,
         data = {},
-        headers = {}
+        headers = {},
+        handleError?: (error: Error | unknown) => void
     ) => {
         // 이상한 method 넣으면 실행 못하게 미리 에러 처리 한다.
-        if (!allowMethod.includes(method.toLowerCase()))
-            throw new Error("허용되지 않은 호출 method입니다.");
+        // if (!allowMethod.includes(method.toLowerCase()))
+        //     throw new Error("허용되지 않은 호출 method입니다.");
         try {
-            const response = await axios({
+            const response = await axios<T>({
                 method,
                 url: `${axios.defaults.baseURL}${url}`,
                 data,
@@ -80,7 +82,12 @@ const axiosRequest: AxiosRequest = {
             // react error boundary?
             // 클라이언트에서 직접 응답을 처리할 수 있도록 axios 훅을 만들면 좋을 것 같다.
             // 리액트 쿼리, SWR
-            console.log(error);
+
+            // 호출하는 쪽에서 직접 error 핸들링
+            if (handleError) {
+                return handleError(error);
+            }
+            console.log("api : ", error);
             throw error;
         }
     }

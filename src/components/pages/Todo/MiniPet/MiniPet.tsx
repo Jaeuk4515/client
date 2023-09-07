@@ -20,10 +20,14 @@ export default function MiniPet() {
     //마이펫 레벨 get
     async function getPetlevel() {
         try {
-            const response: res<Petlevel> = await axiosRequest.requestAxios<
-                res<Petlevel>
-            >("get", `/myPets/myPet/level`);
-            setPetlevel(response.data.level);
+            const response: res<Petlevel> | void =
+                await axiosRequest.requestAxios<res<Petlevel>>(
+                    "get",
+                    `/myPets/myPet/level`
+                );
+            if (response) {
+                setPetlevel(response.data.level);
+            }
         } catch (error) {
             console.error(error);
         }
@@ -42,10 +46,14 @@ export default function MiniPet() {
     //인벤토리 아이템 수량 조회
     async function getItemsCount() {
         try {
-            const response: res<ItemsCount> = await axiosRequest.requestAxios<
-                res<ItemsCount>
-            >("get", `/inventories/itemsCount`);
-            setItemsCount(response.data.count);
+            const response: res<ItemsCount> | void =
+                await axiosRequest.requestAxios<res<ItemsCount>>(
+                    "get",
+                    `/inventories/itemsCount`
+                );
+            if (response) {
+                setItemsCount(response.data.count);
+            }
         } catch (error) {
             console.error(error);
         }

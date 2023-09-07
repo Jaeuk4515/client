@@ -23,10 +23,14 @@ let specialCaseOfYearEnd = false;
 
 async function getTodos(startDate: string, endDate: string) {
     try {
-        const response: res<todoCategory[]> = await axiosRequest.requestAxios<
-            res<todoCategory[]>
-        >("get", `/todoContents?start=${startDate}&end=${endDate}`);
-        return response.data;
+        const response: res<todoCategory[]> | void =
+            await axiosRequest.requestAxios<res<todoCategory[]>>(
+                "get",
+                `/todoContents?start=${startDate}&end=${endDate}`
+            );
+        if (response) {
+            return response.data;
+        }
     } catch (error) {
         console.error("get요청 중 에러: ", error);
         return [];

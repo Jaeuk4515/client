@@ -33,18 +33,19 @@ export default function TodoForm({
     //투두 post요청(투두 생성)
     async function postTodo() {
         try {
-            const response: res<todo[]> = await axiosRequest.requestAxios<
-                res<todo[]>
-            >(
-                "post",
-                `/todoContents`,
-                {
-                    categoryId: categoryId,
-                    todo: value,
-                    date: selectedDate
-                },
-                { "x-custom-data": Date.now() * 4 + 1000 }
-            );
+            const response: res<todo[]> | void =
+                await axiosRequest.requestAxios<res<todo[]>>(
+                    "post",
+                    `/todoContents`,
+                    {
+                        data: {
+                            categoryId: categoryId,
+                            todo: value,
+                            date: selectedDate
+                        }
+                    },
+                    { "x-custom-data": Date.now() * 4 + 1000 }
+                );
         } catch (error) {
             console.error(error);
         }
@@ -52,18 +53,24 @@ export default function TodoForm({
     //투두 patch요청(투두내용수정)
     async function changeTodoContent() {
         try {
-            const response: res<todo[]> = await axiosRequest.requestAxios<
-                res<todo[]>
-            >(
-                "patch",
-                `/todoContents/${contentId}`,
-                {
-                    contentId: contentId,
-                    todo: value,
-                    status: status
-                },
-                { "x-custom-data": Date.now() * 4 + 1000 }
-            );
+            const response: res<todo[]> | void =
+                await axiosRequest.requestAxios<res<todo[]>>(
+                    "patch",
+                    `/todoContents/${contentId}`,
+                    {
+                        data: {
+                            todo: value,
+                            status: status
+                        },
+                        params: {
+                            contentId: contentId
+                        }
+                    },
+                    { "x-custom-data": Date.now() * 4 + 1000 }
+                );
+            if (response) {
+                console.log("성공");
+            }
         } catch (error) {
             console.error(error);
         }

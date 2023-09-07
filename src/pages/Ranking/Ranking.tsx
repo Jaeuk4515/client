@@ -13,11 +13,16 @@ const Ranking: React.FC = () => {
 
     const getUserRankList = async () => {
         try {
-            const response: res<RankInfo[]> = await axiosRequest.requestAxios<
-                res<RankInfo[]>
-            >("get", "/users/rank", {});
-            setUserRankList(response.data);
-            setUserTopThreeList(setTopThree(response.data));
+            const response: res<RankInfo[]> | void =
+                await axiosRequest.requestAxios<res<RankInfo[]>>(
+                    "get",
+                    "/users/rank",
+                    {}
+                );
+            if (response) {
+                setUserRankList(response.data);
+                setUserTopThreeList(setTopThree(response.data));
+            }
         } catch (error) {
             console.error("Error fetching pet data: ", error);
         }

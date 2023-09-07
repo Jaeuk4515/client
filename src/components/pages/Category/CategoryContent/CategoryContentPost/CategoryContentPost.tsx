@@ -63,11 +63,15 @@ const CategoryContentPost: React.FC<CategoryPostProps> = ({
     const getCategory = async () => {
         if (id) {
             try {
-                const response: res<category> = await axiosRequest.requestAxios<
-                    res<category>
-                >("get", `/todoCategories/${id}`);
-                setInputValue(response.data.category);
-                onTextSend(response.data.category);
+                const response: res<category> | void =
+                    await axiosRequest.requestAxios<res<category>>(
+                        "get",
+                        `/todoCategories/${id}`
+                    );
+                if (response) {
+                    setInputValue(response.data.category);
+                    onTextSend(response.data.category);
+                }
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
             }
@@ -91,10 +95,12 @@ const CategoryContentPost: React.FC<CategoryPostProps> = ({
         if (id) {
             try {
                 // PATCH 요청으로 목표를 종료
-                const response: res<category> = await axiosRequest.requestAxios<
-                    res<category>
-                >("patch", `/todoCategories/endCategory/${id}`);
-                if (!response.error) {
+                const response: res<category> | void =
+                    await axiosRequest.requestAxios<res<category>>(
+                        "patch",
+                        `/todoCategories/endCategory/${id}`
+                    );
+                if (response) {
                     alert("목표가 종료되었습니다.");
                     navigate("/category/list");
                 } else {
@@ -112,10 +118,12 @@ const CategoryContentPost: React.FC<CategoryPostProps> = ({
         if (id) {
             try {
                 // PATCH 요청으로 목표를 종료
-                const response: res<category> = await axiosRequest.requestAxios<
-                    res<category>
-                >("delete", `/todoCategories/${id}`);
-                if (!response.error) {
+                const response: res<category> | void =
+                    await axiosRequest.requestAxios<res<category>>(
+                        "delete",
+                        `/todoCategories/${id}`
+                    );
+                if (response) {
                     alert("목표가 삭제되었습니다.");
                     navigate("/category/list");
                 } else {

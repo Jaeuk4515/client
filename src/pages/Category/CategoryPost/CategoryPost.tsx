@@ -17,11 +17,14 @@ const CategoryPost = () => {
         }
 
         try {
-            const response: res<category> = await axiosRequest.requestAxios<
-                res<category>
-            >("post", "/todoCategories", { category });
+            const response: res<category> | void =
+                await axiosRequest.requestAxios<res<category>>(
+                    "post",
+                    "/todoCategories",
+                    { data: { category } }
+                );
 
-            if (!response.error) {
+            if (response) {
                 alert("목표가 등록되었습니다.");
                 navigate("/category/list");
             } else {
@@ -38,11 +41,14 @@ const CategoryPost = () => {
             return;
         }
         try {
-            const response: res<category> = await axiosRequest.requestAxios<
-                res<category>
-            >("patch", `/todoCategories/${id}`, { category });
+            const response: res<category> | void =
+                await axiosRequest.requestAxios<res<category>>(
+                    "patch",
+                    `/todoCategories/${id}`,
+                    { data: { category } }
+                );
 
-            if (!response.error) {
+            if (response) {
                 alert("목표가 수정되었습니다.");
                 navigate("/category/list");
             } else {

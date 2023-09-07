@@ -16,10 +16,14 @@ const dayText = ["일", "월", "화", "수", "목", "금", "토"];
 
 async function getTodos(startDate: string, endDate: string) {
     try {
-        const response: res<todoCategory[]> = await axiosRequest.requestAxios<
-            res<todoCategory[]>
-        >("get", `/todoContents?start=${startDate}&end=${endDate}`);
-        return response.data;
+        const response: res<todoCategory[]> | void =
+            await axiosRequest.requestAxios<res<todoCategory[]>>(
+                "get",
+                `/todoContents?start=${startDate}&end=${endDate}`
+            );
+        if (response) {
+            return response.data;
+        }
     } catch (error) {
         console.error(error);
         return [];

@@ -37,11 +37,16 @@ export default function ActionModal({
 
     async function receiveItemData() {
         try {
-            const response: res<myItems> = await axiosRequest.requestAxios<
-                res<myItems>
-            >("get", "/inventories", {});
-            const itemArray = response.data.items;
-            setItemData(itemArray);
+            const response: res<myItems> | void =
+                await axiosRequest.requestAxios<res<myItems>>(
+                    "get",
+                    "/inventories",
+                    {}
+                );
+            if (response) {
+                const itemArray = response.data.items;
+                setItemData(itemArray);
+            }
         } catch (error) {
             console.error("Error fetching pet data: ", error);
         }
@@ -50,13 +55,19 @@ export default function ActionModal({
     async function handleUseItem(itemId: string) {
         try {
             const data = { quantity: itemCount };
-            const response: res<useItemRes> = await axiosRequest.requestAxios<
-                res<useItemRes>
-            >("post", `/inventories/${itemId}/put`, data, {
-                "x-custom-data": Date.now() * 4 + 1000
-            });
-            receiveItemData();
-            receivePetData();
+            const response: res<useItemRes> | void =
+                await axiosRequest.requestAxios<res<useItemRes>>(
+                    "post",
+                    `/inventories/${itemId}/put`,
+                    { data: data },
+                    {
+                        "x-custom-data": Date.now() * 4 + 1000
+                    }
+                );
+            if (response) {
+                receiveItemData();
+                receivePetData();
+            }
         } catch (error) {
             console.log("Error fetching pet data: ", error);
         }
@@ -65,12 +76,20 @@ export default function ActionModal({
     async function handleDumpItem(itemId: string) {
         try {
             const data = { quantity: itemCount * -1 };
-            const response: res<dumpItemRes> = await axiosRequest.requestAxios<
-                res<dumpItemRes>
-            >("patch", `/inventories/items/${itemId}`, data, {
-                "x-custom-data": Date.now() * 4 + 1000
-            });
-            receiveItemData();
+            const response: res<dumpItemRes> | void =
+                await axiosRequest.requestAxios<res<dumpItemRes>>(
+                    "patch",
+                    `/inventories/items/${itemId}`,
+                    {
+                        data: data
+                    },
+                    {
+                        "x-custom-data": Date.now() * 4 + 1000
+                    }
+                );
+            if (response) {
+                receiveItemData();
+            }
         } catch (error) {
             console.error("Error fetching pet data: ", error);
         }

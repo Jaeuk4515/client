@@ -33,11 +33,16 @@ export default function InventoryModal({ on }: parameterType) {
 
     async function receiveItemData() {
         try {
-            const response: res<myItems> = await axiosRequest.requestAxios<
-                res<myItems>
-            >("get", "/inventories", {});
-            const itemArray = response.data.items;
-            setItemData(itemArray);
+            const response: res<myItems> | void =
+                await axiosRequest.requestAxios<res<myItems>>(
+                    "get",
+                    "/inventories",
+                    {}
+                );
+            if (response) {
+                const itemArray = response.data.items;
+                setItemData(itemArray);
+            }
         } catch (error) {
             console.error("Error fetching pet data: ", error);
         }

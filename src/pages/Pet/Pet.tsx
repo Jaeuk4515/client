@@ -18,39 +18,41 @@ export default function Pet() {
 
     async function receivePetData() {
         try {
-            const response: res<myPet> = await axiosRequest.requestAxios<
+            const response: res<myPet> | void = await axiosRequest.requestAxios<
                 res<myPet>
             >("get", "/myPets", {});
-            const petInfo = response.data.pet;
-            const petLevel: number | null = petInfo.level;
-            // const petLevel: number = 5;
+            if (response) {
+                const petInfo = response.data.pet;
+                const petLevel: number | null = petInfo.level;
+                // 데이터를 객체로 업데이트
+                setPetData({
+                    hungerInfo: {
+                        curHunger: petInfo.hunger,
+                        maxHunger: 100 + petLevel * 20
+                    },
+                    affectionInfo: {
+                        curAffection: petInfo.affection,
+                        maxAffection: 100 + petLevel * 20
+                    },
+                    conditionInfo: {
+                        curCondition: petInfo.condition,
+                        maxCondition: 100 + petLevel * 20
+                    },
+                    cleanlinessInfo: {
+                        curCleanliness: petInfo.cleanliness,
+                        maxCleanliness: 100 + petLevel * 20
+                    },
+                    expInfo: {
+                        curExperience: petLevel < 5 ? petInfo.experience : 1,
+                        maxExperience:
+                            petLevel < 5 ? 100 * 2 ** (petLevel + 1) - 100 : 1
+                    },
+                    levelInfo: petLevel,
+                    petName: petInfo.petName
+                });
+            }
 
-            // 데이터를 객체로 업데이트
-            setPetData({
-                hungerInfo: {
-                    curHunger: petInfo.hunger,
-                    maxHunger: 100 + petLevel * 20
-                },
-                affectionInfo: {
-                    curAffection: petInfo.affection,
-                    maxAffection: 100 + petLevel * 20
-                },
-                conditionInfo: {
-                    curCondition: petInfo.condition,
-                    maxCondition: 100 + petLevel * 20
-                },
-                cleanlinessInfo: {
-                    curCleanliness: petInfo.cleanliness,
-                    maxCleanliness: 100 + petLevel * 20
-                },
-                expInfo: {
-                    curExperience: petLevel < 5 ? petInfo.experience : 1,
-                    maxExperience:
-                        petLevel < 5 ? 100 * 2 ** (petLevel + 1) - 100 : 1
-                },
-                levelInfo: petLevel,
-                petName: petInfo.petName
-            });
+            // const petLevel: number = 5;
         } catch (error) {
             console.error("Error fetching pet data: ", error);
         }

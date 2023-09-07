@@ -107,10 +107,15 @@ export default function MyPage() {
 
     const getUserInfo = async () => {
         try {
-            const response: res<myUser> = await axiosRequest.requestAxios<
-                res<myUser>
-            >("get", "/users", {});
-            setUserInfo(response.data);
+            const response: res<myUser> | void =
+                await axiosRequest.requestAxios<res<myUser>>(
+                    "get",
+                    "/users",
+                    {}
+                );
+            if (response) {
+                setUserInfo(response.data);
+            }
         } catch (error) {
             console.error("Error fetching userInfo data: ", error);
         }

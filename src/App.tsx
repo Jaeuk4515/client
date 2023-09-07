@@ -7,6 +7,8 @@ import Loading from "./components/Loading/Loading";
 import { StyleSheetManager } from "styled-components";
 import axiosRequest from "./api";
 import { res } from "./@types";
+import { error } from "console";
+import { AxiosError } from "axios";
 // import NotFound from "@/pages/NotFound";
 
 const Todo = lazy(() => import("@/pages/Todo/Todo"));
@@ -68,15 +70,18 @@ const App: React.FC = () => {
     const checkAuth = async () => {
         setIsLoading(true); // api 호출하는 동안만
         try {
-            const response: res<auth> = await axiosRequest.requestAxios<
+            const response: res<auth> | void = await axiosRequest.requestAxios<
                 res<auth>
-            >("get", `/users/auth`);
+            >("get", `/users/auth`, {}, {}, (error: AxiosError | unknown) => {
+                alert("에러발생!" + error);
+            });
             setIsLoading(false);
-            if (response.data.status === 200) {
+            if (response && response.data.status === 200) {
                 setIsAuth(true);
                 return;
             }
         } catch (error) {
+            console.log("App.tsx : " + error);
             setIsAuth(false);
             navigate("/");
             console.error("Failed to check auth.", error);

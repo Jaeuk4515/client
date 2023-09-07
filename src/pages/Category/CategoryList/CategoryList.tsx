@@ -16,10 +16,14 @@ const CategoryList = () => {
 
     const getCategories = async () => {
         try {
-            const response: res<category[]> = await axiosRequest.requestAxios<
-                res<category[]>
-            >("get", "/todoCategories");
-            setCategoryList(response.data);
+            const response: res<category[]> | void =
+                await axiosRequest.requestAxios<res<category[]>>(
+                    "get",
+                    "/todoCategories"
+                );
+            if (response) {
+                setCategoryList(response.data);
+            }
         } catch (error) {
             console.error("Failed to fetch categories:", error);
         }

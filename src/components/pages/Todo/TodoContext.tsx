@@ -80,17 +80,19 @@ export default function TodoContextProvider({
     //기간별 투두 불러오기
     async function getTodos(startDate: string, endDate: string) {
         try {
-            const response: res<todoCategory[]> =
+            const response: res<todoCategory[]> | void =
                 await axiosRequest.requestAxios<res<todoCategory[]>>(
                     "get",
                     `/todoContents?start=${startDate}&end=${endDate}`
                 );
-            if (startDate === endDate) {
-                setDateTodos(response.data);
-            } else {
-                setPeriodTodos(response.data);
+            if (response) {
+                if (startDate === endDate) {
+                    setDateTodos(response.data);
+                } else {
+                    setPeriodTodos(response.data);
+                }
+                return response.data;
             }
-            return response.data;
         } catch (error) {
             console.error(error);
         }
@@ -119,45 +121,54 @@ export default function TodoContextProvider({
                     // 이전 타이머가 있으면 취소합니다.
                     clearTimeout(timer);
                 }
-                const response: res<todo> = await axiosRequest.requestAxios<
-                    res<todo>
-                >(
-                    "patch",
-                    `/todoContents/${contentId}`,
-                    {
-                        contentId: contentId,
-                        todo: content,
-                        status: checkStatus
-                    },
-                    { "x-custom-data": Date.now() * 4 + 1000 }
-                );
+                const response: res<todo> | void =
+                    await axiosRequest.requestAxios<res<todo>>(
+                        "patch",
+                        `/todoContents/${contentId}`,
+                        {
+                            data: {
+                                todo: content,
+                                status: checkStatus
+                            },
+                            params: {
+                                contentId: contentId
+                            }
+                        },
+                        { "x-custom-data": Date.now() * 4 + 1000 }
+                    );
 
-                setMessage(response.data.message);
-                setIsActiveToast(true);
-
-                // 새로운 타이머를 설정합니다.
-                setTimer(
-                    setTimeout(() => {
-                        setIsActiveToast(false);
-                    }, 5500)
-                );
-                getTodos(selectedDate, selectedDate);
-                getTodos(startDate, endDate);
+                if (response) {
+                    setMessage(response.data.message);
+                    setIsActiveToast(true);
+                    // 새로운 타이머를 설정합니다.
+                    setTimer(
+                        setTimeout(() => {
+                            setIsActiveToast(false);
+                        }, 5500)
+                    );
+                    getTodos(selectedDate, selectedDate);
+                    getTodos(startDate, endDate);
+                }
             } else {
-                const response: res<todo> = await axiosRequest.requestAxios<
-                    res<todo>
-                >(
-                    "patch",
-                    `/todoContents/${contentId}`,
-                    {
-                        contentId: contentId,
-                        todo: content,
-                        status: checkStatus
-                    },
-                    { "x-custom-data": Date.now() * 4 + 1000 }
-                );
-                getTodos(selectedDate, selectedDate);
-                getTodos(startDate, endDate);
+                const response: res<todo> | void =
+                    await axiosRequest.requestAxios<res<todo>>(
+                        "patch",
+                        `/todoContents/${contentId}`,
+                        {
+                            data: {
+                                todo: content,
+                                status: checkStatus
+                            },
+                            params: {
+                                contentId: contentId
+                            }
+                        },
+                        { "x-custom-data": Date.now() * 4 + 1000 }
+                    );
+                if (response) {
+                    getTodos(selectedDate, selectedDate);
+                    getTodos(startDate, endDate);
+                }
             }
         } catch (error) {
             console.error(error);
@@ -166,11 +177,15 @@ export default function TodoContextProvider({
 
     async function deleteTodo(contentId: string) {
         try {
-            const response: res<todo[]> = await axiosRequest.requestAxios<
-                res<todo[]>
-            >("delete", `/todoContents/${contentId}`);
-            getTodos(selectedDate, selectedDate);
-            getTodos(startDate, endDate);
+            const response: res<todo[]> | void =
+                await axiosRequest.requestAxios<res<todo[]>>(
+                    "delete",
+                    `/todoContents/${contentId}`
+                );
+            if (response) {
+                getTodos(selectedDate, selectedDate);
+                getTodos(startDate, endDate);
+            }
         } catch (error) {
             console.error(error);
         }

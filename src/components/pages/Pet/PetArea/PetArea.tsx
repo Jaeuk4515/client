@@ -247,10 +247,15 @@ export function PetArea({
 
     const isInventoryFull = async () => {
         try {
-            const response: res<itemsCount> = await axiosRequest.requestAxios<
-                res<itemsCount>
-            >("get", "/inventories/itemsCount", {});
-            setIsFull(response.data.count >= maxVolume);
+            const response: res<itemsCount> | void =
+                await axiosRequest.requestAxios<res<itemsCount>>(
+                    "get",
+                    "/inventories/itemsCount",
+                    {}
+                );
+            if (response) {
+                setIsFull(response.data.count >= maxVolume);
+            }
         } catch (error) {
             console.error("Error fetching pet data: ", error);
         }

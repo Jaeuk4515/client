@@ -34,10 +34,14 @@ export function UserInfo({ picture, name, date }: userinfoType) {
     const navigate = useNavigate();
     const getUserName = async () => {
         try {
-            const response: res<myUser> = await axiosRequest.requestAxios<
-                res<myUser>
-            >("get", "/users/user");
-            setNickname(response.data.nickname);
+            const response: res<myUser> | void =
+                await axiosRequest.requestAxios<res<myUser>>(
+                    "get",
+                    "/users/user"
+                );
+            if (response) {
+                setNickname(response.data.nickname);
+            }
         } catch (error) {
             alert("오류가 발생했습니다. 다시 시도해 주세요.");
         }
@@ -71,9 +75,9 @@ export function UserInfo({ picture, name, date }: userinfoType) {
 
     useEffect(() => {
         if (charCount > 6) {
-        setError('닉네임은 한글 6자, 영어 12자까지 입력 가능합니다.');
+            setError("닉네임은 한글 6자, 영어 12자까지 입력 가능합니다.");
         } else {
-        setError('');
+            setError("");
         }
     }, [charCount]);
 
@@ -87,7 +91,7 @@ export function UserInfo({ picture, name, date }: userinfoType) {
             // 한글 여부를 판단하여 카운트 증가
             if (/[ㄱ-ㅎ가-힣]/.test(value[i])) {
                 count += 1;
-            } 
+            }
             if (/[a-zA-Z]/.test(value[i])) {
                 count += 0.5;
             }
@@ -111,17 +115,21 @@ export function UserInfo({ picture, name, date }: userinfoType) {
 
     const handleNicknameChange = async () => {
         try {
-            const response: res<myUser> = await axiosRequest.requestAxios<
-                res<myUser>
-            >("patch", "/users/myInfo", { nickname });
+            const response: res<myUser> | void =
+                await axiosRequest.requestAxios<res<myUser>>(
+                    "patch",
+                    "/users/myInfo",
+                    { data: { nickname } }
+                );
 
-            if(response.data) {  // 닉네임이 제대로 변경이 되었을 때
+            if (response) {
+                // 닉네임이 제대로 변경이 되었을 때
                 alert("닉네임이 수정되었습니다!");
+            } else {
+                // 글자 제한을 통과하지 못해 변경이 되지 않았을때
+                return; // 닉네임 변경 버튼 눌러도 반응없음
             }
-            else {  // 글자 제한을 통과하지 못해 변경이 되지 않았을때
-                return;  // 닉네임 변경 버튼 눌러도 반응없음
-            }
-            navigate(0);  // 페이지 새로고침
+            navigate(0); // 페이지 새로고침
         } catch (error) {
             alert("오류가 발생했습니다. 다시 시도해 주세요.");
         }
@@ -148,7 +156,9 @@ export function UserInfo({ picture, name, date }: userinfoType) {
                                         // onChange={(e: any) =>
                                         //     setNickname(e.target.value)
                                         // }
-                                        style={{ borderColor: error ? 'red' : '' }}
+                                        style={{
+                                            borderColor: error ? "red" : ""
+                                        }}
                                     />
                                     <ErrorText error={error}>{error}</ErrorText>
                                     {/* {error && <ErrorText>{error}</ErrorText>} */}
